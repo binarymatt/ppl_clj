@@ -1,5 +1,5 @@
 (ns ppl.views.welcome
-  (:require [ppl.views.common :as common]
+  (:require [ppl.templates :as common]
             [noir.content.getting-started])
   (:use [noir.core :only [defpage]]
         [hiccup.core :only [html]])
