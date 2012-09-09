@@ -28,7 +28,7 @@
            (session/put! :github-token token)
            (let [github-user (ppl_auth/github-user token)]
             ;create user if they don't exist
-            (def current-user (check-user (get gitub-user)))
+            (def current-user (check-user (get gitub-user "email")))
             (if current-user)
               (current-user)
               (insert users (values (create-user github-user token)))
