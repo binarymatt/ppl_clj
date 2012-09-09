@@ -11,7 +11,7 @@ lein run
 
 ## License
 
-Copyright (C) 2011 FIXME
+Copyright (C) 2012 mattg
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Distributed under the BSD License.
 
