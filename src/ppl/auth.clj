@@ -4,15 +4,6 @@
   (:require [noir.session :as session])
 )
 
-(def facebook-oauth2
-  {:authorization-uri "https://graph.facebook.com/oauth/authorize"
-   :access-token-uri "https://graph.facebook.com/oauth/access_token"
-   :redirect-uri "http://example.com/oauth2-callback"
-   :client-id "1234567890"
-   :client-secret "0987654321"
-   :access-query-param :access_toke
-   :scope ["user_photos" "friends_photos"]
-   :grant-type "authorization_code"})
 
 (def github
   {
@@ -29,8 +20,8 @@
 (def auth-req
   (oauth2/make-auth-request github "some-csrf"))
 
-(defn access-token [params]
-  (oauth2/get-access-token github params auth-req))
+(defn access-token [req]
+  (oauth2/get-access-token github req auth-req))
 
 (defn github-user-email [access-token]
   (let [response (oauth2/get "https://api.github.com/user" {:query-params {:access_token access-token}} )]
@@ -38,12 +29,15 @@
 
 (defn github-user [access-token]
   (let [response (oauth2/get "https://api.github.com/user" {:query-params {:access_token access-token}} )]
-    (parse-string (:body response)) "email"))
+    (parse-string (:body response))))
 
 (defn login-user [id]
   (session/put! :user-id id)
   true)
 
+(defn logged-in? []
+  (when-let [id (session/get :user-id)]
+    id))
 ;(defn current-user []
 ;  (users/find-by-id (session/get :user-id)))
 

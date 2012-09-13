@@ -7,6 +7,13 @@
   (:require [stencil.core :refer [render-file]])
   (:require [clj-oauth2.client :as oauth2])
   (:require [ppl.auth :as ppl_auth])
+  ;(:require [korma.db :refer [select]])
+  (:use [korma.core :only [select where fields, insert, values]])
+  ;(:require [ppl.models :refer [users]])
+  (:use [ppl.models :only [users]])
+  ;(:require [korma.db] 
+  ;          [korma.core] 
+  ;          [ppl.models])
   ;(:use [ppl.views.auth :only (auth-req access-token github-user-email)])
 )
 (defn create-user [github-map token]
@@ -16,29 +23,42 @@
 (defn check-user [email]
   (seq (select users (fields :id)(where {:email email}))))
 
+(defn update-token [id token]
+  (if-not (seq (select users (fields :id)(where {:email email :access_token token})))
+    (update users (set-fields {:access_token token})(where {:id id}))
+    )
+  (id)
+  )
+
+
 (defpage "/signup/" []
+         (println "signups")
          (common/layout "Signup" :signup
-           [:div.span4 "signup"]))
+           [:div.span4 
+            [:a {:href "/login/github"} "login with github"]]))
 
 (defpage "/login/github" []
          (redirect (:uri ppl_auth/auth-req)))
 
 (defpage "/login/github/callback" {:as req}
-         (let [token (ppl_auth/access-token req)]
+         (let [token (get (ppl_auth/access-token req) :access-token)]
            (session/put! :github-token token)
-           (let [github-user (ppl_auth/github-user token)]
-            ;create user if they don't exist
-            (def current-user (check-user (get gitub-user "email")))
-            (if current-user)
-              (current-user)
-              (insert users (values (create-user github-user token)))
-            ))
+           (let [guser (ppl_auth/github-user token)]
+             ;new user? create and login
+             ;
+            (def current-user (check-user (get guser "email")))
+            (ppl_auth/login-user (if current-user
+              (update-token current-user token)
+              (insert users (values (create-user guser token)))
+            ))))
+         (redirect "/home")
+
            ;login said user
            
            ;redirect to home page
            )
-  )
+  
 (defpage "/details" []
-         (ppl_auth/github-user-email ((session/get :github-token) :access-token)))
+         (ppl_auth/github-user-email (session/get :github-token)))
 
 (defpage "/profile" [])
