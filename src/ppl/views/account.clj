@@ -8,7 +8,7 @@
   (:require [clj-oauth2.client :as oauth2])
   (:require [ppl.auth :as ppl_auth])
   ;(:require [korma.db :refer [select]])
-  (:use [korma.core :only [select where fields, insert, values]])
+  (:use [korma.core :only [select where fields, insert, values, update, set-fields]])
   ;(:require [ppl.models :refer [users]])
   (:use [ppl.models :only [users]])
   ;(:require [korma.db] 
@@ -24,7 +24,7 @@
   (seq (select users (fields :id)(where {:email email}))))
 
 (defn update-token [id token]
-  (if-not (seq (select users (fields :id)(where {:email email :access_token token})))
+  (if-not (seq (select users (fields :id)(where {:access_token token})))
     (update users (set-fields {:access_token token})(where {:id id}))
     )
   (id)
@@ -32,11 +32,12 @@
 
 
 (defpage "/signup/" []
-         (println "signups")
          (common/layout "Signup" :signup
            [:div.span4 
             [:a {:href "/login/github"} "login with github"]]))
 
+(defpage "/login/" []
+         (common/layout "Login" :login))
 (defpage "/login/github" []
          (redirect (:uri ppl_auth/auth-req)))
 
@@ -46,11 +47,11 @@
            (let [guser (ppl_auth/github-user token)]
              ;new user? create and login
              ;
-            (def current-user (check-user (get guser "email")))
+            (let [current-user (check-user (get guser "email"))]
             (ppl_auth/login-user (if current-user
               (update-token current-user token)
               (insert users (values (create-user guser token)))
-            ))))
+            )))))
          (redirect "/home")
 
            ;login said user
@@ -61,4 +62,6 @@
 (defpage "/details" []
          (ppl_auth/github-user-email (session/get :github-token)))
 
-(defpage "/profile" [])
+(defpage "/profile" []
+  (when-not (ppl_auth/logged-in?)
+    (redirect "/login")))
