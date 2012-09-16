@@ -2,6 +2,9 @@
   (:require [clj-oauth2.client :as oauth2])
   (:use [cheshire.core :only (parse-string)])
   (:require [noir.session :as session])
+  (:use [noir.response :only [redirect]])
+  (:use [korma.core :only [select where fields, insert, values, update, set-fields]])
+  (:use [ppl.models :only [users profiles]])
 )
 
 
@@ -38,6 +41,14 @@
 (defn logged-in? []
   (when-let [id (session/get :user-id)]
     id))
+
+(defn login-required! []
+  (when-not (logged-in?)
+    (redirect "/login/")))
+
+(defn current-user []
+  (first (select users(where {:id (session/get :user-id)}))))
+
 ;(defn current-user []
 ;  (users/find-by-id (session/get :user-id)))
 

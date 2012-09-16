@@ -6,13 +6,10 @@
   (:use [stencil.core :only [render-file]]))
 
 (defpage "/" []
-         (common/layout
+         (common/layout "Welcome" :welcome
            [:p "Welcome to ppl"]))
 
 (defpage "/mustache" []
   (render-file "templates/layout"
              {:name "Donald"}))
 
-(defpage "/home" []
-         (common/layout
-           ))

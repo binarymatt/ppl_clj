@@ -2,16 +2,9 @@
   ;(:require [lobos.migrations :as migrations])
   (:use [korma.db]
         [korma.core]
-        ))
+        )
+  (:use [config.database]))
 
-(def db
-  {:classname "org.postgresql.Driver"
-   :subprotocol "postgresql"
-   :subname "ppl"
-   :user "matt"
-   :password ""})
-
-(defdb dev db)
 (defentity profiles)
 (defentity users
   (has-one profiles  {:fk :user_id}))

@@ -29,7 +29,6 @@
   (up [] (create 
            (table :users 
                   (integer :id :primary-key :auto-inc)
-                  (integer :sign_in_count (default 0))
                   (timestamp :created_ts (default (now)))
                   (timestamp :updated_ts)
                   (boolean :admin (default false))

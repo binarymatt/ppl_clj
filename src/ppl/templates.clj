@@ -1,5 +1,5 @@
 (ns ppl.templates
-  
+  (:require [ppl.auth :as auth])
   (:use [noir.core :only [defpartial]]
         [hiccup.page :only [include-css include-js html5]]
         [hiccup.element :only [link-to]]))
@@ -31,6 +31,7 @@
                [:title title " / ppl"]
                (include-css "/css/bootstrap.css")
                (include-css "/css/bootstrap-responsive.css")
+               (include-css "/css/font-awesome.css")
                "<!--[if lt IE 9]>"
                (include-js "http://html5shim.googlecode.com/svn/trunk/html5.js")
                "<![endif]-->"
@@ -40,13 +41,22 @@
                 [:div.navbar.navbar-static-top
                  [:div.navbar-inner
                   [:div.container
-                   [:a.brand {:href "#"} "Nashvl"]
+                   [:a.brand {:href "/"} "Nashvl"]
                    [:ul.nav
-                    [:li [:a {:href "#"} [:strong "People"]]]
-                    [:li [:a {:href "#"} "Companies"]]
-                    [:li [:a {:href "#"} "Groups"]]
-                    [:li [:a {:href "#"} "Jobs"]]
+                    [:li [:a {:href "/people"} "People"]]
+                    [:li [:a {:href "/companies"} "Companies"]]
+                    [:li [:a {:href "/groups"} "Groups"]]
+                    [:li [:a {:href "/jobs"} "Jobs"]]
                     ]
+                    (if (auth/logged-in?)
+                      [:ul.nav.pull-right
+                        [:li [:a {:href "/profile"} "Profile"]]
+                        [:li [:a {:href "/logout"} "Logout"]]
+                      ]
+                      [:ul.nav.pull-right
+                        [:li [:a {:href "/login"} "Login"]]
+                      ]
+                    )
                    ]
                   ]
                  ]
