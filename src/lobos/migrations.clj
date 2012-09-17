@@ -9,7 +9,7 @@
   {:classname "org.sqlite.JDBC"
    :subprotocol "sqlite"
    :subname "./db.sqlite3"})
-(def  db
+(def  db-old
   {:classname "org.postgresql.Driver"
    :subprotocol "postgresql"
    :subname "ppl"
